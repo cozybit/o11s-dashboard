@@ -18,10 +18,12 @@
 
 import string
 import logging
+import os
  
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext import db
+from google.appengine.ext.webapp import template
 from google.appengine.api import namespace_manager
 
 def local_nets_key():
@@ -55,6 +57,18 @@ class MainPage(webapp.RequestHandler):
 
 class AddNet(webapp.RequestHandler):
 	def get(self):
+		self.response.out.write("""
+			<html>
+				<body>
+					<form action="/addnetwork" method="post">
+						<div><input type=text name="netid"></input></div>
+						<div><input type="submit" value="Add Network"></div>
+					</form>
+				</body>
+			</html>""")
+		return
+
+	def post(self):
 		netid = self.request.str_params['netid']
 		logging.info('netid: ' + netid)
 		if netid == None:
@@ -66,6 +80,8 @@ class AddNet(webapp.RequestHandler):
 			net = MeshNetwork( key_name = netid, 
 								parent = local_nets_key())
 			net.put()
+			self.redirect("/list")
+
 		else:	
 			logging.error("DUP NETID")
 			self.error(400);
@@ -73,11 +89,11 @@ class AddNet(webapp.RequestHandler):
 
 class ListNets(webapp.RequestHandler):
 	def get(self):
-		self.response.headers['Content-Type'] = 'text/plain'
-		for net in list_of_networks():
-			self.response.out.write('network:' + '\n')
-			self.response.out.write(net.key().name() + '\n')
-			self.response.out.write(str(net.date) + '\n')
+		template_values = {
+			'nets': list_of_networks(),
+		}
+		path = os.path.join(os.path.dirname(__file__), "net.html")
+		self.response.out.write(template.render(path, template_values))
 
 application = webapp.WSGIApplication(
 									[
