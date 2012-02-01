@@ -1,0 +1,23 @@
+<!-- vim:set ts=2 sw=2 et: -->
+<html>
+  <body>
+    <table>
+    {% for node in nodes %}
+        <tr>
+        <td>
+        <b>{{ node.key.name }}</b>
+        </td>
+        <td>
+        {{ node.lat }}
+        </td>
+        <td>
+        {{ node.lon }}
+        </td>
+        </tr>
+    {% endfor %}
+    </table>
+    <div>
+    <a href="/addnode?netid={{ netid }}">Add more nodes to network {{ netid }}</a>
+    </div>
+  </body>
+</html>

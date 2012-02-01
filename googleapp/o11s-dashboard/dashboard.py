@@ -19,6 +19,8 @@
 import string
 import logging
 import os
+import random
+import re
  
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
@@ -30,9 +32,26 @@ def local_nets_key():
 	return db.Key.from_path('MeshNetwork', 'o11s_networks')
 
 def list_of_networks():
-		return MeshNetwork.gql("WHERE ANCESTOR IS :1 " 
+	return MeshNetwork.gql("WHERE ANCESTOR IS :1 " 
 						   		"ORDER BY date DESC", 
 								local_nets_key() )
+
+def list_of_mesh_nodes():
+	"""List of mesh nodes on a given network namespace."""
+	return MeshNode.gql("")
+
+def switch_namespace(netid):
+	if netid == None:
+		self.error(400);
+		return False
+
+	net = MeshNetwork.get_by_key_name(netid, parent = local_nets_key())
+	if net == None:
+		self.error(400);
+		return False
+	namespace_manager.set_namespace(net.key().name());
+	return True
+
 # Data model is as follows:
 # 
 # MeshNetwork 1-----* Mesh Nodes (in Datastore) 
@@ -83,7 +102,6 @@ class AddNet(webapp.RequestHandler):
 			self.redirect("/list")
 
 		else:	
-			logging.error("DUP NETID")
 			self.error(400);
 		return
 
@@ -95,13 +113,63 @@ class ListNets(webapp.RequestHandler):
 		path = os.path.join(os.path.dirname(__file__), "net.html")
 		self.response.out.write(template.render(path, template_values))
 
+def validate(addr):
+		try:
+			s=re.search(r'([0-9A-F]{2}[:-]){5}([0-9A-F]{2})', addr, re.I).group()
+			return True
+		except:
+			return False
+		
+
+class AddNode(webapp.RequestHandler):
+	def get(self):
+		# netid is optional in this case
+		netid = self.request.str_params['netid']
+		template_values = {
+			'nets': list_of_networks(),
+			'netid': netid,
+		}
+		path = os.path.join(os.path.dirname(__file__), "addnode.html")
+		self.response.out.write(template.render(path, template_values))
+		return
+
+	def post(self):
+		netid = self.request.str_params['netid']
+		if not switch_namespace(netid):
+			self.error(400);
+			return
+
+		macaddr = self.request.str_params['macaddr']
+		if not validate(macaddr):
+			self.error(400);
+			return
+
+		node = MeshNode(key_name = macaddr, lat = random.random(), lon = random.random());
+		node.put()
+		self.redirect('/listnodes?netid=' + netid)
+
+class ListNodes(webapp.RequestHandler):
+	def get(self):
+		netid = self.request.str_params['netid']
+		if not switch_namespace(netid):
+			self.error(400);
+			return
+
+		template_values = {
+			'nodes': list_of_mesh_nodes(),
+			'netid' : netid,
+		}
+		path = os.path.join(os.path.dirname(__file__), "nodes.html")
+		self.response.out.write(template.render(path, template_values))
+
+
 application = webapp.WSGIApplication(
 									[
 										('/', MainPage),
 									  	('/addnetwork', AddNet),
-#									  	('/addnode', Register),
+									  	('/addnode', AddNode),
 									  	('/list', ListNets),
-#									  	('/checkin', RecordPoint),
+									  	('/listnodes', ListNodes),
 									],
 									 debug=True)
 

@@ -1,0 +1,19 @@
+<!-- vim:set ts=2 sw=2 et: -->
+<html>
+	<body>
+		<form action="/addnode" method="post">
+      Network ID:
+      <select name="netid">
+      {% for net in nets %}
+        {% ifequal net.key.name netid %}
+          <option value="{{net.key.name}}" selected="selected">{{net.key.name}}</option>
+        {% else %}
+          <option value="{{net.key.name}}">{{net.key.name}}</option>
+        {% endifequal %}
+      {% endfor %}
+      </select>
+			<div>MAC: <input type=text name="macaddr" maxlength="17" size="17"></input> (e.g. 00:22:33:44:55)</div>
+			<div><input type="submit" value="Add node"></div>
+		</form>
+	</body>
+</html>
