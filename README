@@ -1,0 +1,7 @@
+Simple management console for mesh networks.
+
+1. Admins create networks and give them a name.
+2. Admins add mesh nodes to those networks by entering the MAC address of each node.
+3. Mesh nodes periodically check into the console to report relevant stats.
+4. Admins monitor the network via a browser.
+

@@ -1,0 +1,5 @@
+- Enter mesh nodes with Google Maps.
+- Show a lot more information about each mesh node:  channel, peers, mesh ID, SSID, traffic stats, etc.
+- Use Google account authentication.  
+- Admins can only modify the networks they create.
+- Networks can be public (all can see, only creator can modify) or private (only creator can view and modify).
