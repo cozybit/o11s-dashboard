@@ -81,6 +81,7 @@ class AddNet(webapp.RequestHandler):
 		self.response.out.write("""
 			<html>
 				<body>
+					Please, no spaces or strange characters...<br/>
 					<form action="/addnetwork" method="post">
 						<div><input type=text name="netid"></input></div>
 						<div><input type="submit" value="Add Network"></div>
@@ -92,7 +93,7 @@ class AddNet(webapp.RequestHandler):
 	def post(self):
 		netid = self.request.str_params['netid']
 		logging.info('netid: ' + netid)
-		if netid == None:
+		if netid == None or not validate_netid(netid):
 			self.error(400);
 			return
 		# Check for existence first
@@ -115,12 +116,11 @@ class ListNets(webapp.RequestHandler):
 		path = os.path.join(os.path.dirname(__file__), "net.html")
 		self.response.out.write(template.render(path, template_values))
 
-def validate(addr):
-		try:
-			s=re.search(r'([0-9A-F]{2}[:-]){5}([0-9A-F]{2})', addr, re.I).group()
-			return True
-		except:
-			return False
+def validate_mac(addr):
+		return re.match(r'([0-9A-F]{2}[:-]){5}([0-9A-F]{2})', addr, re.I) != None
+
+def validate_netid(netid):
+		return re.match(r'^[0-9A-Za-z._-]{0,100}$', netid, re.I) != None
 		
 class CheckIn(webapp.RequestHandler):
 	def get(self):
@@ -135,7 +135,7 @@ class CheckIn(webapp.RequestHandler):
 			return
 
 		macaddr = self.request.str_params['macaddr']
-		if not validate(macaddr):
+		if not validate_mac(macaddr):
 			self.error(400);
 			return
 
@@ -163,7 +163,7 @@ class AddNode(webapp.RequestHandler):
 			return
 
 		macaddr = self.request.str_params['macaddr']
-		if not validate(macaddr):
+		if not validate_mac(macaddr):
 			self.error(400);
 			return
 
