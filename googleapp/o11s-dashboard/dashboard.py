@@ -21,6 +21,7 @@ import logging
 import os
 import random
 import re
+import datetime
  
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
@@ -68,6 +69,7 @@ class MeshNode(db.Model):
 	mac = db.StringListProperty()
 	lat = db.FloatProperty()
 	lon = db.FloatProperty()
+	last_seen = db.DateTimeProperty(auto_now_add=True)
 
 class MainPage(webapp.RequestHandler):
 	def get(self):
@@ -120,6 +122,27 @@ def validate(addr):
 		except:
 			return False
 		
+class CheckIn(webapp.RequestHandler):
+	def get(self):
+		# Maybe some tiny embedded nodes don't support post so accept
+		# GET checkins as well.
+		self.post()
+
+	def post(self):
+		netid = self.request.str_params['netid']
+		if not switch_namespace(netid):
+			self.error(400);
+			return
+
+		macaddr = self.request.str_params['macaddr']
+		if not validate(macaddr):
+			self.error(400);
+			return
+
+		node = MeshNode.get_by_key_name(macaddr);
+		node.last_seen = datetime.datetime.now()
+		node.put()
+		return
 
 class AddNode(webapp.RequestHandler):
 	def get(self):
@@ -170,6 +193,7 @@ application = webapp.WSGIApplication(
 									  	('/addnode', AddNode),
 									  	('/list', ListNets),
 									  	('/listnodes', ListNodes),
+									  	('/checkin', CheckIn),
 									],
 									 debug=True)
 

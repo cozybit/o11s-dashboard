@@ -2,10 +2,14 @@
 <html>
   <body>
     <table>
+    <tr><td><b>MAC</b></td><td><b>Last Seen</b></td><td><b>Latitude</b></td><td><b>Longitude</b></td></tr>
     {% for node in nodes %}
         <tr>
         <td>
         <b>{{ node.key.name }}</b>
+        </td>
+        <td>
+        {{ node.last_seen }}
         </td>
         <td>
         {{ node.lat }}
