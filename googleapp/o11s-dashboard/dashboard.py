@@ -187,6 +187,7 @@ class ListNodes(webapp.RequestHandler):
 		template_values = {
 			'nodes': list_of_mesh_nodes(),
 			'netid' : netid,
+			'now' : datetime.datetime.now()
 		}
 		path = os.path.join(os.path.dirname(__file__), "nodes.html")
 		self.response.out.write(template.render(path, template_values))

@@ -11,17 +11,44 @@
       src="http://maps.googleapis.com/maps/api/js?key=AIzaSyCKkTKpGzeVYdBchWpMF7HHkRsvvnDmCb8&sensor=false"> </script>
     <script type="text/javascript">
       var map;
+
+      function relative_time(reftime_str, now_str) {
+        ref = new Date(reftime_str);
+        now = new Date(now_str);
+        delta_s = parseInt((now - ref) / 1000);
+        if (delta_s < 60)
+          return delta_s + 's ago';
+
+        delta_m = parseInt(delta_s/60);
+        delta_s = delta_s%60;
+        if (delta_m < 60)
+          return delta_m + 'm ' + delta_s + 's ago';
+
+        delta_h = parseInt(delta_m/60);
+        delta_m = delta_m%60;
+        if (delta_h < 24)
+          return delta_h + 'h ' + delta_m + 'm ' + delta_s + 's ago';
+
+        delta_d = parseInt(delta_h/24);
+        delta_h = delta_h%24;
+        return delta_d + 'd ' + delta_h + 'h ' + delta_m + 'm ' + delta_s + 's ago';
+      }
+
       function initialize() {
 
         var nodes = [
           {% for node in nodes %}
-          ["{{ node.key.name }}", {{ node.lat }}, {{ node.lng }}],
+          ["{{ node.key.name }}",
+            {{ node.lat }},
+            {{ node.lng }},
+            relative_time("{{ node.last_seen.isoformat }}", "{{ now.isoformat }}" )
+          ]
           {% endfor %}
         ];
 
         var avglat = 0.0, avglng = 0.0;
-  
-        for (i = 0; i < nodes.length; i++) {  
+
+        for (i = 0; i < nodes.length; i++) {
           avglat += parseFloat(nodes[i][1]);
           avglng += parseFloat(nodes[i][2]);
         };
@@ -50,15 +77,21 @@
 
         var marker, i;
 
-        for (i = 0; i < nodes.length; i++) {  
+        for (i = 0; i < nodes.length; i++) {
           marker = new google.maps.Marker({
             position: new google.maps.LatLng(nodes[i][1], nodes[i][2]),
             map: map
           });
 
+          var contentString =
+            '<table>' +
+            '<tr><td>MAC:</td><td>' + nodes[i][0] + '</td></tr>' +
+            '<tr><td>Last Seen:</td><td>' + nodes[i][3] + '</td></tr>' +
+            '</table>';
+
           google.maps.event.addListener(marker, 'click', (function(marker, i) {
             return function() {
-              infowindow.setContent(nodes[i][0]);
+              infowindow.setContent(contentString);
               infowindow.open(map, marker);
             }
           })(marker, i));
