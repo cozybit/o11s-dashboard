@@ -74,8 +74,7 @@
         });
 
         var infowindow = new google.maps.InfoWindow();
-
-        var marker, i;
+        var marker, i, contentString;
 
         for (i = 0; i < nodes.length; i++) {
           marker = new google.maps.Marker({
@@ -83,18 +82,17 @@
             map: map
           });
 
-          var contentString =
+          contentString =
             '<table>' +
             '<tr><td>MAC:</td><td>' + nodes[i][0] + '</td></tr>' +
             '<tr><td>Last Seen:</td><td>' + nodes[i][3] + '</td></tr>' +
             '</table>';
-
-          google.maps.event.addListener(marker, 'click', (function(marker, i) {
+          google.maps.event.addListener(marker, 'click', (function(marker, i, content) {
             return function() {
-              infowindow.setContent(contentString);
+              infowindow.setContent(content);
               infowindow.open(map, marker);
             }
-          })(marker, i));
+          })(marker, i, contentString));
         }
       }
 
