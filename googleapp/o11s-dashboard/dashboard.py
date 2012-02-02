@@ -134,7 +134,7 @@ class CheckIn(webapp.RequestHandler):
 			self.error(400);
 			return
 
-		macaddr = self.request.str_params['macaddr']
+		macaddr = self.request.str_params['macaddr'].lower()
 		if not validate_mac(macaddr):
 			self.error(400);
 			return
@@ -166,7 +166,7 @@ class AddNode(webapp.RequestHandler):
 			self.error(400);
 			return
 
-		macaddr = self.request.str_params['macaddr']
+		macaddr = self.request.str_params['macaddr'].lower()
 		if not validate_mac(macaddr):
 			self.error(400);
 			return
