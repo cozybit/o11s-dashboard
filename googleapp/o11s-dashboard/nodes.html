@@ -42,7 +42,7 @@
             {{ node.lat }},
             {{ node.lng }},
             relative_time("{{ node.last_seen.isoformat }}", "{{ now.isoformat }}" )
-          ]
+          ],
           {% endfor %}
         ];
 
