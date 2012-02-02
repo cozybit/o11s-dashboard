@@ -12,4 +12,4 @@ MACADDR=`ip link show mesh0 | grep 'link/ether' | awk '{ print $2 }'`
 
 wget -O - -d --post-data "netid=${NETID}&macaddr=${MACADDR}" ${DASHBOARD_URL}/checkin
 # OR
-# curl -f -s ${DASHBOARD_URL}/checkin -d "netid=${NETID}&macaddr=00:11:22:33:44:55"
+# curl -f -s ${DASHBOARD_URL}/checkin -d "netid=${NETID}&macaddr=${MACADDR}"
