@@ -1,27 +1,89 @@
 <!-- vim:set ts=2 sw=2 et: -->
 <html>
-  <body>
-    <table>
-    <tr><td><b>MAC</b></td><td><b>Last Seen</b></td><td><b>Latitude</b></td><td><b>Longitude</b></td></tr>
-    {% for node in nodes %}
-        <tr>
-        <td>
-        <b>{{ node.key.name }}</b>
-        </td>
-        <td>
-        {{ node.last_seen }}
-        </td>
-        <td>
-        {{ node.lat }}
-        </td>
-        <td>
-        {{ node.lon }}
-        </td>
-        </tr>
-    {% endfor %}
-    </table>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <style type="text/css">
+      html { height: 100% }
+      body { height: 100%; margin: 0; padding: 0 }
+      #map_canvas { height: 100% }
+    </style>
+    <script type="text/javascript"
+      src="http://maps.googleapis.com/maps/api/js?key=AIzaSyCKkTKpGzeVYdBchWpMF7HHkRsvvnDmCb8&sensor=false"> </script>
+    <script type="text/javascript">
+      var map;
+      function initialize() {
+
+        var nodes = [
+          {% for node in nodes %}
+          ["{{ node.key.name }}", {{ node.lat }}, {{ node.lng }}],
+          {% endfor %}
+        ];
+
+        var avglat = 0.0, avglng = 0.0;
+  
+        for (i = 0; i < nodes.length; i++) {  
+          avglat += parseFloat(nodes[i][1]);
+          avglng += parseFloat(nodes[i][2]);
+        };
+
+        if ( nodes.length > 0) {
+          avglat /= nodes.length;
+          avglng /= nodes.length;
+        } else {
+          avglat = 37.788986;
+          avglng =-122.401251;
+        }
+
+        var myOptions = {
+          center: new google.maps.LatLng(avglat,avglng),
+          zoom: 18,
+          mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+
+        map = new google.maps.Map(document.getElementById("map_canvas"),
+            myOptions);
+          google.maps.event.addListener(map, 'dblclick', function(event) {
+            placeMarker(event.latLng);
+        });
+
+        var infowindow = new google.maps.InfoWindow();
+
+        var marker, i;
+
+        for (i = 0; i < nodes.length; i++) {  
+          marker = new google.maps.Marker({
+            position: new google.maps.LatLng(nodes[i][1], nodes[i][2]),
+            map: map
+          });
+
+          google.maps.event.addListener(marker, 'click', (function(marker, i) {
+            return function() {
+              infowindow.setContent(nodes[i][0]);
+              infowindow.open(map, marker);
+            }
+          })(marker, i));
+        }
+      }
+
+      function placeMarker(location) {
+        var marker = new google.maps.Marker({
+            position: location,
+            map: map
+        });
+        window.location = "/addnode?netid={{ netid }}&lat=" + location.lat() + "&lng=" + location.lng()
+      }
+    </script>
+  </head>
+  <body onload="initialize()">
     <div>
-    <a href="/addnode?netid={{ netid }}">Add more nodes to network {{ netid }}</a>
+    <h2>Network: {{ netid }}</h2>
+    Double-click anywhere on the map to add a node to <b>{{ netid }}</b> network.
     </div>
+    <div id="map_canvas" style="width:50%; height:50%"></div>
+    <div>
+    <a href="/list">See all networks</a>
+    </div>
+  </body>
+</html>
   </body>
 </html>

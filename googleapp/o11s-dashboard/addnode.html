@@ -13,6 +13,8 @@
       {% endfor %}
       </select>
 			<div>MAC: <input type=text name="macaddr" maxlength="17" size="17"></input> (e.g. 00:11:22:33:44:55)</div>
+			<div>LAT: <input type=text name="lat" size="30" readonly value={{lat}}></input></div>
+			<div>LNG: <input type=text name="lng" size="30" readonly value={{lng}}></input></div>
 			<div><input type="submit" value="Add node"></div>
 		</form>
 	</body>

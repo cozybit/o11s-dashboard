@@ -68,7 +68,7 @@ class MeshNode(db.Model):
 	"""Models mesh point"""
 	mac = db.StringListProperty()
 	lat = db.FloatProperty()
-	lon = db.FloatProperty()
+	lng = db.FloatProperty()
 	last_seen = db.DateTimeProperty(auto_now_add=True)
 
 class MainPage(webapp.RequestHandler):
@@ -148,9 +148,13 @@ class AddNode(webapp.RequestHandler):
 	def get(self):
 		# netid is optional in this case
 		netid = self.request.str_params['netid']
+		lat = self.request.str_params['lat']
+		lng = self.request.str_params['lng']
 		template_values = {
 			'nets': list_of_networks(),
 			'netid': netid,
+			'lat' : lat,
+			'lng' : lng,
 		}
 		path = os.path.join(os.path.dirname(__file__), "addnode.html")
 		self.response.out.write(template.render(path, template_values))
@@ -167,7 +171,10 @@ class AddNode(webapp.RequestHandler):
 			self.error(400);
 			return
 
-		node = MeshNode(key_name = macaddr, lat = random.random(), lon = random.random());
+		lat = float(self.request.str_params['lat'])
+		lng = float(self.request.str_params['lng'])
+
+		node = MeshNode(key_name = macaddr, lat = lat, lng = lng);
 		node.put()
 		self.redirect('/listnodes?netid=' + netid)
 
@@ -177,7 +184,6 @@ class ListNodes(webapp.RequestHandler):
 		if not switch_namespace(netid):
 			self.error(400);
 			return
-
 		template_values = {
 			'nodes': list_of_mesh_nodes(),
 			'netid' : netid,
