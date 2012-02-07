@@ -1,0 +1,13 @@
+URL='http://o11s-dashboard.appspot.com'
+NETID='testnetwork'
+LAT[0]=37.78900931644195
+LNG[0]=-122.40124295337296
+MAC[0]=00:11:22:33:44:55
+
+while getopts "l" opt; do
+       case $opt in
+               l)
+               URL='http://localhost:8080'
+               ;;
+       esac
+done
