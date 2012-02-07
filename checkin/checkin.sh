@@ -15,7 +15,7 @@ IFCONFIG=/sbin/ifconfig
 
 MACADDR=`${IP} link show ${MESH_IFACE} | grep 'link/ether' | awk '{ print $2 }'`
 if test -z ${MACADDR}; then
-	MACADDR=`ifconfig ${MESH_IFACE} | head -1 | awk '{ print $5 }'`
+	MACADDR=`${IFCONFIG} ${MESH_IFACE} | head -1 | awk '{ print $5 }'`
 fi
 
 PEERS=`${IW} $MESH_IFACE station dump | grep -e ESTAB -B 14 | grep -e Station | awk '{ print $2 }'`
