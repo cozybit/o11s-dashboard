@@ -70,6 +70,7 @@ class MeshNode(db.Model):
 	lat = db.FloatProperty()
 	lng = db.FloatProperty()
 	last_seen = db.DateTimeProperty(auto_now_add=True)
+	peers = db.ListProperty(db.Key);
 
 class MainPage(webapp.RequestHandler):
 	def get(self):
@@ -141,6 +142,14 @@ class CheckIn(webapp.RequestHandler):
 
 		node = MeshNode.get_by_key_name(macaddr);
 		node.last_seen = datetime.datetime.now()
+		peers = self.request.str_params.getall("peer")
+		node.peers = []
+		for p in peers:
+			if not validate_mac(p):
+				continue
+			peer = MeshNode.get_by_key_name(p);
+			if peer != None:
+				node.peers.append(peer.key())
 		node.put()
 		return
 

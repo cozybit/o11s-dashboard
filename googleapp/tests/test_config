@@ -1,8 +1,17 @@
 URL='http://o11s-dashboard.appspot.com'
 NETID='testnetwork'
-LAT[0]=37.78900931644195
-LNG[0]=-122.40124295337296
-MAC[0]=00:11:22:33:44:55
+GRID_SIZE=3
+LAST_NODE=$((GRID_SIZE*GRID_SIZE - 1))
+
+for i in `seq 0 $((GRID_SIZE-1))`
+do 
+	for j in `seq 0 $((GRID_SIZE-1))`
+	do
+		LAT[$((i*GRID_SIZE+j))]=37.789${i}
+		LNG[$((i*GRID_SIZE+j))]=-122.401${j}
+		MAC[$((i*GRID_SIZE+j))]=${j}${i}:11:22:33:44:55
+	done
+done
 
 while getopts "l" opt; do
        case $opt in
