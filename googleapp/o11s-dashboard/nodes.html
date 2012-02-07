@@ -94,6 +94,15 @@
             }
           })(marker, i, contentString));
         }
+
+        {% for link in links %}
+          var linkCoord = [
+          {% for node in link %}
+            new google.maps.LatLng({{ node.lat }}, {{ node.lng }}),
+          {% endfor %}
+          ];
+          drawLink(map, linkCoord);
+        {% endfor %}
       }
 
       function placeMarker(location) {
@@ -102,6 +111,17 @@
             map: map
         });
         window.location = "/addnode?netid={{ netid }}&lat=" + location.lat() + "&lng=" + location.lng()
+      }
+
+      function drawLink(map, coord) {
+        var peerLink = new google.maps.Polyline({
+          path: coord,
+          strokeColor: "#7db700",
+          strokeOpacity: 0.9,
+          strokeWeight: 2
+        });
+        peerLink.setMap(map);
+        var debug = [ coord[0], coord[1] ];
       }
     </script>
   </head>

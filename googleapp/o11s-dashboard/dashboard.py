@@ -193,10 +193,20 @@ class ListNodes(webapp.RequestHandler):
 		if not switch_namespace(netid):
 			self.error(400);
 			return
+
+		links = []
+		for node in list_of_mesh_nodes():
+			for p in node.peers:
+				peer = MeshNode.get(p)
+				if (peer != None):
+					link = [node, peer]
+					links.append(link)
+
 		template_values = {
 			'nodes': list_of_mesh_nodes(),
 			'netid' : netid,
-			'now' : datetime.datetime.now()
+			'now' : datetime.datetime.now(),
+			'links' : links,
 		}
 		path = os.path.join(os.path.dirname(__file__), "nodes.html")
 		self.response.out.write(template.render(path, template_values))
