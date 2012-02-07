@@ -9,8 +9,11 @@ set -x
 DASHBOARD_URL='http://o11s-dashboard.appspot.com'
 NETID='605_market'
 MESH_IFACE=mesh0
-MACADDR=`ip link show ${MESH_IFACE} | grep 'link/ether' | awk '{ print $2 }'`
-PEERS=`iw $MESH_IFACE station dump | grep -e ESTAB -B 14 | grep -e Station | awk '{ print $2 }'`
+IW=/usr/local/sbin/iw
+IP=/sbin/ip
+
+MACADDR=`${IP} link show ${MESH_IFACE} | grep 'link/ether' | awk '{ print $2 }'`
+PEERS=`${IW} $MESH_IFACE station dump | grep -e ESTAB -B 14 | grep -e Station | awk '{ print $2 }'`
 
 for p in ${PEERS}
 do
