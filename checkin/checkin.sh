@@ -11,8 +11,13 @@ NETID='605_market'
 MESH_IFACE=mesh0
 IW=/usr/local/sbin/iw
 IP=/sbin/ip
+IFCONFIG=/sbin/ifconfig
 
 MACADDR=`${IP} link show ${MESH_IFACE} | grep 'link/ether' | awk '{ print $2 }'`
+if test -z ${MACADDR}; then
+	MACADDR=`ifconfig ${MESH_IFACE} | head -1 | awk '{ print $5 }'`
+fi
+
 PEERS=`${IW} $MESH_IFACE station dump | grep -e ESTAB -B 14 | grep -e Station | awk '{ print $2 }'`
 
 for p in ${PEERS}
@@ -25,4 +30,4 @@ wget -O - -d --post-data ${POSTDATA} ${DASHBOARD_URL}/checkin
 # OR
 # curl -f -s ${DASHBOARD_URL}/checkin -d ${POSTDATA}"
 # OR
-# wget -O - ${DASHBOARD_URL}/checkin"?${POSTDATA}"
+# wget -O - "${DASHBOARD_URL}/checkin?${POSTDATA}"
