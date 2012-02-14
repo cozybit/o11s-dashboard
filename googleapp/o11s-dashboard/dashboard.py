@@ -22,6 +22,8 @@ import os
 import random
 import re
 import datetime
+import math
+import copy
  
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
@@ -187,6 +189,25 @@ class AddNode(webapp.RequestHandler):
 		node.put()
 		self.redirect('/listnodes?netid=' + netid)
 
+def split_links(link):
+	''' Nudge links one direction or another so that symmetic links are displayed as double lines '''
+	delta_lat = link[0].lat - link[1].lat
+	delta_lng = link[0].lng - link[1].lng
+	link_len = math.sqrt(delta_lat**2 + delta_lng**2)
+	if (delta_lat):
+		slope = -float(delta_lng / delta_lat)
+	else:
+		slope = float('inf')	
+	if (delta_lat != 0):
+		offset = math.copysign(link_len/40, delta_lat)
+	else:
+		offset = math.copysign(link_len/40, delta_lng)
+	link[0].lat += offset*math.sin(math.atan(slope))
+	link[1].lat += offset*math.sin(math.atan(slope)) 
+	link[0].lng += offset*math.cos(math.atan(slope))
+	link[1].lng += offset*math.cos(math.atan(slope))
+	return link
+
 class ListNodes(webapp.RequestHandler):
 	def get(self):
 		netid = self.request.str_params['netid']
@@ -199,7 +220,7 @@ class ListNodes(webapp.RequestHandler):
 			for p in node.peers:
 				peer = MeshNode.get(p)
 				if (peer != None):
-					link = [node, peer]
+					link = split_links([copy.copy(node), copy.copy(peer)])
 					links.append(link)
 
 		template_values = {
