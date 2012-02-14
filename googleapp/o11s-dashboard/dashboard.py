@@ -199,9 +199,9 @@ def split_links(link):
 	else:
 		slope = float('inf')	
 	if (delta_lat != 0):
-		offset = math.copysign(link_len/40, delta_lat)
+		offset = cmp(delta_lat,0) * link_len/40
 	else:
-		offset = math.copysign(link_len/40, delta_lng)
+		offset = cmp(delta_lng,0) * link_len/40
 	link[0].lat += offset*math.sin(math.atan(slope))
 	link[1].lat += offset*math.sin(math.atan(slope)) 
 	link[0].lng += offset*math.cos(math.atan(slope))
