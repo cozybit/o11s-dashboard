@@ -191,8 +191,9 @@ class AddNode(webapp.RequestHandler):
 
 def split_links(link):
 	''' Nudge links one direction or another so that symmetic links are displayed as double lines '''
+	# calculate the slope in units of length, not degrees, which depends on latitude
 	delta_lat = link[0].lat - link[1].lat
-	delta_lng = link[0].lng - link[1].lng
+	delta_lng = (link[0].lng - link[1].lng) * math.cos(math.radians(link[0].lat))
 	link_len = math.sqrt(delta_lat**2 + delta_lng**2)
 	if (delta_lat):
 		slope = -float(delta_lng / delta_lat)
