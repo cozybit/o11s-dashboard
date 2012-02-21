@@ -7,6 +7,48 @@
       html { height: 100% }
       body { height: 100%; margin: 10; padding: 0 }
       #map_canvas { height: 100% }
+      #table_nodes, #table_nodes table
+      {
+        font-family:"Courier New", monospace;
+        width:100%;
+        border-collapse:collapse;
+      }
+      #table_nodes td, #table_nodes th
+      {
+        font-size:0.8em;
+        font-weight:900;
+        border: 0px;
+        color: #ffffff;
+        padding:3px 7px 2px 7px;
+        text-align:center;
+      }
+      #table_nodes th
+      {
+        font-family:"Courier New", monospace;
+        font-size:1.2em;
+        font-weight:bold;
+        background:#7db700;
+        color:#000;
+      }
+      #table_nodes tr.odd
+      {
+        background:#5B8500;
+      }
+      #table_nodes tr.even
+      {
+        background:#856c00;
+      }
+      #table_nodes th
+      {
+        font-family:"Courier New", monospace;
+        font-size:1.2em;
+        background:#7db700;
+        color:#000;
+      }
+      .dataTables_filter,.dataTables_info,.dataTables_paginate
+      {
+        background:#7db700;
+      }
     </style>
     <script type="text/javascript" language="javascript" src="js/jquery.js"></script>
     <script type="text/javascript" language="javascript" src="js/jquery.dataTables.js"></script>
@@ -133,19 +175,20 @@
     <script type="text/javascript" charset="utf-8">
       $(document).ready(function() {
         initialize()
-        $('#table_nodes').html( '<table cellpadding="0" cellspacing="0" border="0" class="display" id="data" width="100%"></table>' );
+        $('#table_nodes').html( '<table class="display" id="data"></table>' );
         $('#data').dataTable( {
           "bJQueryUI": true,
-          "bAutoWidth": true, 
-          "sPaginationType": "full_numbers",      
+          "bAutoWidth": true,
+          "bLengthChange" : false,
+          "sPaginationType": "full_numbers",
           "aaData": nodes,
           "aoColumns": [
             { "sTitle": "MAC" },
-            { "sTitle": "Latitude" },
-            { "sTitle": "Longitude" },
-            { "sTitle": "Last seen" }
+            { "sTitle": "Lat" },
+            { "sTitle": "Long" },
+            { "sTitle": "Last Seen" }
           ]
-        } );  
+        } );
       } );
     </script>
 
@@ -157,7 +200,7 @@
     </div>
     <div id="map_canvas" style="width:50%; height:50%"></div>
     <a href="/list">See all networks</a>
-    <div id="table_nodes" style= "width:50%; height:30%"></div> 
+    <div id="table_nodes" style= "width:50%; height:30%"></div>
   </body>
 </html>
   </body>
