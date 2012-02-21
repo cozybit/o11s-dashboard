@@ -3,8 +3,9 @@
   <head>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
     <style type="text/css">
+      @import "css/smoothness/jquery-ui-1.8.17.custom.css";
       html { height: 100% }
-      body { height: 100%; margin: 0; padding: 0 }
+      body { height: 100%; margin: 10; padding: 0 }
       #map_canvas { height: 100% }
       #nodesTable
       {
@@ -28,10 +29,14 @@
         color:#fff;
       }
     </style>
+    <script type="text/javascript" language="javascript" src="js/jquery.js"></script>
+    <script type="text/javascript" language="javascript" src="js/jquery.dataTables.js"></script>
     <script type="text/javascript"
       src="http://maps.googleapis.com/maps/api/js?key=AIzaSyCKkTKpGzeVYdBchWpMF7HHkRsvvnDmCb8&sensor=false"> </script>
+
     <script type="text/javascript">
       var map;
+      var nodes;
 
       function relative_time(reftime_str, now_str) {
         ref = new Date(reftime_str);
@@ -70,7 +75,7 @@
 
       function initialize() {
 
-        var nodes = [
+        nodes = [
           {% for node in nodes %}
           ["{{ node.key.name }}",
             {{ node.lat }},
@@ -160,13 +165,35 @@
         var debug = [ coord[0], coord[1] ];
       }
     </script>
+
+    <script type="text/javascript" charset="utf-8">
+      $(document).ready(function() {
+        initialize()
+        $('#table_nodes').html( '<table cellpadding="0" cellspacing="0" border="0" class="display" id="example" width="100%"></table>' );
+        $('#example').dataTable( {
+          "bJQueryUI": true,
+          "bAutoWidth": true, 
+          "sPaginationType": "full_numbers",      
+          "aaData": nodes,
+          "aoColumns": [
+            { "sTitle": "Node Id" },
+            { "sTitle": "Latitude" },
+            { "sTitle": "Longitude" },
+            { "sTitle": "Last time seen" }
+          ]
+        } );  
+      } );
+    </script>
+
   </head>
-  <body onload="initialize()">
+<!--  <body onload="initialize()">-->
+  <body>
     <div>
     <h2>Network: {{ netid }}</h2>
     Double-click anywhere on the map to add a node to <b>{{ netid }}</b> network.
     </div>
     <div id="map_canvas" style="width:50%; height:50%"></div>
+    <div id="table_nodes" style= "width:50%; height:30%"></div> 
     <div>
     <a href="/list">See all networks</a>
     </div>
